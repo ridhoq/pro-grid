@@ -58,6 +58,17 @@ for(var y = 0; y < gridDimensions; y++) {
   }
 }
 
+function checkIfGridColored () {
+  console.log("checking if grid is colored!");
+  for (var y = 0; y < gridDimensions; y++) {
+    for (var x = 0; x < gridDimensions; x++) {
+      if (grid[y][x].color == '')
+        return false;
+    }
+  }
+  return true;
+} 
+
 /* server startup checks. If any of these fail the server will not run. 
  * the validateData function in order to start the server. 
  */
@@ -121,6 +132,16 @@ io.sockets.on('connection', function (socket) {
       generateApiKey(socket);
       if(gridCol.color == '') {
         gridCol.color = data.color;
+        if (checkIfGridColored()) {
+          console.log('Clearing grid!');
+          for (var y = 0; y < gridDimensions; y++) {
+            for (var x = 0; x < gridDimensions; x++) {
+              var resetGridCol = grid[y][x];
+              resetGridCol.color = '';
+              socket.broadcast.emit('update', resetGridCol);
+            }
+          }
+        }
       } else {
         gridCol.color = '';
       }
