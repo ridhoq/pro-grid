@@ -47,16 +47,20 @@ function checkApiKey (key) {
 // instantiate grid array
 // this happens once per server boot
 var grid = [];
-for(var y = 0; y < gridDimensions; y++) {
-  grid.push(new Array(gridDimensions));
-  for(var x = 0; x < gridDimensions; x++) {
-    grid[y][x] = {
-      row: y,
-      col: x,
-      color: ""
-    };
-  }
+createGrid();
+function createGrid() {
+  for(var y = 0; y < gridDimensions; y++) {
+    grid.push(new Array(gridDimensions));
+    for(var x = 0; x < gridDimensions; x++) {
+      grid[y][x] = {
+        row: y,
+        col: x,
+        color: ""
+      };
+    }
+  } 
 }
+
 
 function checkIfGridColored () {
   console.log("checking if grid is colored!");
@@ -134,13 +138,9 @@ io.sockets.on('connection', function (socket) {
         gridCol.color = data.color;
         if (checkIfGridColored()) {
           console.log('Clearing grid!');
-          for (var y = 0; y < gridDimensions; y++) {
-            for (var x = 0; x < gridDimensions; x++) {
-              var resetGridCol = grid[y][x];
-              resetGridCol.color = '';
-              socket.broadcast.emit('update', resetGridCol);
-            }
-          }
+          grid.length = 0;
+          createGrid();
+          socket.broadcast.emit('server ready', {gridArray: grid});
         }
       } else {
         gridCol.color = '';
