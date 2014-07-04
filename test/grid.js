@@ -83,7 +83,7 @@ describe('Grid', function() {
         });
     });
 
-    it('should update redis when grid is updated with a new color', function() {
+    it('should update redis when grid is updated with a new color', function(done) {
       var data = {
         row: '12',
         col: '24',
@@ -91,11 +91,14 @@ describe('Grid', function() {
       };
       var grid = new Grid(gridDimensions, redisClient)
         .then(function () {
+          console.log('hi');
           grid.updateGrid(client, data)
             .then(function() {
+              console.log('bye');
               var query = data.row + '-' + data.col;
               redisClient.get(query, function(err, reply) {
                 assert(reply === data.color);
+                done();
               });
             });
         });
@@ -109,21 +112,22 @@ describe('Grid', function() {
       };
       var grid = new Grid(gridDimensions, redisClient)
         .then(function () {
+          console.log('SHIT');
           grid.updateGrid(client, data)
             .then(function() {
+              console.log('a');
               var query = data.row + '-' + data.col;
               redisClient.get(query, function(err, reply) {
                 assert(reply === data.color);
-              });
-            })
-            .then(function() {
-              grid.updateGrid(client,data)
-                .then(function() {
-                  var query = data.row + '-' + data.col;
-                  redisClient.get(query, function(err, reply) {
-                    assert(!reply);
+                grid.updateGrid(client,data)
+                  .then(function() {
+                    console.log('2');
+                    var query = data.row + '-' + data.col;
+                    redisClient.get(query, function(err, reply) {
+                      assert(!reply);
+                    });
                   });
-                });
+              });
             });
         });
     });
